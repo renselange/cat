@@ -14,5 +14,10 @@ decremnet = st.button('Decrement')
 if increment:
     st.session_state.count = (st.session_state.count +1)%len(q)
 
+if decrement:
+    st.session_state.count = (st.session_state.count -1)%len(q)
+
+
+
 
 st.write('Count = ', st.session_state.count)
