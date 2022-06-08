@@ -10,11 +10,14 @@ import streamlit as st
 #### when item has been administered, remove from local structure
 ####
 
+
+def do_cat(): return 0 # implement and we have real CAT
+
+'# An item DB with three glorious questions'
+
 if not 'done' in st.session_state:
 
     st.session_state.done = False
-
-    st.session_state.answers = [['Answer A correct','Answer B wrong','Answer C wrong','Answer D wrong']]
 
     st.session_state.questions = [('q1','What is the capital of the Netherlands?',['Amsterdam','Brussels','Westerlee','No clue'],0),
                                   ('q2','WHat is the capital of Europe?',['Paris','Rome','London','Europe has no capital'],3),
@@ -22,16 +25,12 @@ if not 'done' in st.session_state:
                                   ]
 
     st.write(st.session_state.questions)
+    st.session_state.ready     = []
+    st.session_state.answers = {}
+    st.session_state.save_answers = True
 
 
-    st.session_state.ready     = [('What is the capital of the Netherlands',['Amsterdam','Brussels','Westerlee','No clue'])]
-
-
-if not 'save_answers' in st.session_state:
-    st.session_state.save_answers = {}
-
-
-def pick_one(qid,question, options, answer_index,button='First click best answer, then press this button'):
+def pick_one(qid,question, options, answer_index,button='First click the best answer, then press this button'):
 
     user_answer = st.radio(question, options=options,key=qid)
 
@@ -47,16 +46,23 @@ def pick_one(qid,question, options, answer_index,button='First click best answer
         return False, None
 
 
-pick_one('abc123','wassup? but that is too short - typically there is quite a bit of text here',['a','b','c','d'],3)
+if not st.session_state.done:
+
+    pick_this_one = do_cat() # all I have to do is to implement do_cat and we have REAL cat!!!!!
+
+    qid,qtext,qchoices,qcorrect = st.session_state.questions.pop(pick_this_one) 
+
+    administer =  pick_one(qid,qtext,qchoices,qcorrect)
+
+    st.session_state.answers[qid] = administer
+
+    st.session_state.done = len(st.session_state.answers) > 2
 
 
-pick_one('pqr456','wassup? but that is too short - typically there is quite a bit of text here',['a','b','c','d'],0)
+if st.session_state.done:
 
-for k in st.session_state: 
-    if k != 'save_answers': 
-        st.write(k)
-        del st.session_state[k]
+    '# and we are finished'
 
-st.session_state['save_answers']
+    st.write(st.session_state)
 
 
