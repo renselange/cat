@@ -1,6 +1,7 @@
 import streamlit as st
 
-from random import random
+#from random import random
+#from pprint import pprint
 
 #### plan:
 #### store all item info in excel/csv sheet
@@ -9,42 +10,53 @@ from random import random
 #### when item has been administered, remove from local structure
 ####
 
-def expand(x): return [x]
-
 if not 'done' in st.session_state:
 
-    st.session_state.done    = False
-    st.session_state.unused  = [(0,[0,0]),(1,[0,-1,1]),(2,[0,0])]
-    st.session_state.used    = []
-    st.session_state.pending = []
+    st.session_state.done = False
+
+    st.session_state.answers = [['Answer A correct','Answer B wrong','Answer C wrong','Answer D wrong']]
+
+    st.session_state.questions = [('q1','What is the capital of the Netherlands?',['Amsterdam','Brussels','Westerlee','No clue'],0),
+                                  ('q2','WHat is the capital of Europe?',['Paris','Rome','London','Europe has no capital'],3),
+                                  ('q3','What is the capital of Canada?',['Montreal','Ottawa',"Vancouver",'New Found Land','Sioux Ste. Marie'],1)
+                                  ]
+
+    st.write(st.session_state.questions)
 
 
-if not st.session_state.done:
-
-    if not st.session_state.pending:
-
-# get either a starter item or the most informative item
-        seq = int(random() * len(st.session_state.unused)) # randomly 
-        st.session_state.pending = [st.session_state.unused.pop(seq)]
-
-# pick the first item from the pending list, always
-    if st.session_state.pending:
-        first = st.session_state.pending.pop(0)
-        st.write('Administer this item:',first)
-        st.session_state.used.append(first)
-
-        st.session_state.done = len(st.session_state.unused) == 0
-
-    next_question = st.button('Press to continue ...')
-    if next_question:
-        st.write(st.session_state)
+    st.session_state.ready     = [('What is the capital of the Netherlands',['Amsterdam','Brussels','Westerlee','No clue'])]
 
 
-if st.session_state.done:
-    'Thank you, you are done now'
-    st.table(st.session_state.used)
-  
+if not 'save_answers' in st.session_state:
+    st.session_state.save_answers = {}
 
 
+def pick_one(qid,question, options, answer_index,button='First click best answer, then press this button'):
+
+    user_answer = st.radio(question, options=options,key=qid)
+
+    if st.button(button, key=qid+'987654321'):
+
+        is_correct = options.index(user_answer) == answer_index
+        
+        if "save_answers" in st.session_state: 
+            st.session_state.save_answers[qid] = [qid,user_answer,options[answer_index],is_correct]
+        return True, is_correct
+
+    else:
+        return False, None
+
+
+pick_one('abc123','wassup? but that is too short - typically there is quite a bit of text here',['a','b','c','d'],3)
+
+
+pick_one('pqr456','wassup? but that is too short - typically there is quite a bit of text here',['a','b','c','d'],0)
+
+for k in st.session_state: 
+    if k != 'save_answers': 
+        st.write(k)
+        del st.session_state[k]
+
+st.session_state['save_answers']
 
 
